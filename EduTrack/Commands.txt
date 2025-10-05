@@ -1,6 +1,0 @@
-npx create-next-app student-portal
-cd student-portal
-npm install @supabase/supabase-js
-npm install -D tailwindcss postcss autoprefixer
-npx create-next-app@latest student-portal-next --tailwind
-
