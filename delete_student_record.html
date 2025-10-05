@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Students Demo</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 70%;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #eee;
+    }
+    button {
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Students Dashboard</h1>
+
+  <!-- 1️⃣ Display all students in a table -->
+  <h2>All Students:</h2>
+  <table id="studentTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Grade</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be added dynamically -->
+    </tbody>
+  </table>
+
+  <!-- 2️⃣ Edit form (reuse from before) -->
+  <div id="editFormContainer" style="display:none;">
+    <h3>Edit Student</h3>
+    <form id="editForm">
+      <input type="text" id="editName" placeholder="Name" required>
+      <input type="number" id="editGrade" placeholder="Grade" required>
+      <button type="submit">Update Student</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const supabaseUrl = 'https://lbvhhioxniycjyrpcrnc.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidmhoaW94bml5Y2p5cnBjcm5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1ODk0NzUsImV4cCI6MjA3NTE2NTQ3NX0.rOOdSAESpdD93Lc-SrjaVg3U3Xse295gL9kq8Y0iaR4'
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const studentTableBody = document.querySelector('#studentTable tbody')
+    const editFormContainer = document.getElementById('editFormContainer')
+    const editForm = document.getElementById('editForm')
+    const editName = document.getElementById('editName')
+    const editGrade = document.getElementById('editGrade')
+
+    let currentEditId = null
+
+    // Fetch and display all students in table
+    async function fetchStudents() {
+      const { data, error } = await supabase.from('students').select('*').order('id')
+      if (error) return console.error('Error fetching students:', error)
+
+      studentTableBody.innerHTML = ''
+      data.forEach(student => {
+        const row = document.createElement('tr')
+        row.innerHTML = `
+          <td>${student.id}</td>
+          <td>${student.name}</td>
+          <td>${student.grade}</td>
+          <td>
+            <button onclick="editStudent(${student.id}, '${student.name}', ${student.grade})">Edit</button>
+            <button onclick="deleteStudent(${student.id})" style="color:red;">Delete</button>
+          </td>
+        `
+        studentTableBody.appendChild(row)
+      })
+    }
+
+    // Expose functions globally so onclick works
+    window.editStudent = (id, name, grade) => {
+      currentEditId = id
+      editName.value = name
+      editGrade.value = grade
+      editFormContainer.style.display = 'block'
+    }
+
+    window.deleteStudent = async (id) => {
+      if (!confirm(`Are you sure you want to delete student ID ${id}?`)) return
+
+      const { error } = await supabase.from('students').delete().eq('id', id)
+      if (error) return console.error('Error deleting student:', error)
+
+      alert('Student deleted successfully!')
+      fetchStudents()
+    }
+
+    // Update student record
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      if (!currentEditId) return alert('No student selected')
+
+      const { error } = await supabase.from('students')
+        .update({ name: editName.value, grade: parseInt(editGrade.value) })
+        .eq('id', currentEditId)
+
+      if (error) return console.error('Error updating student:', error)
+
+      alert('Student updated successfully!')
+      editFormContainer.style.display = 'none'
+      currentEditId = null
+      fetchStudents()
+    })
+
+    // Initial fetch
+    fetchStudents()
+  </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Management Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Top Nav -->
+  <header class="bg-blue-600 text-white shadow-md">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold">📘 Student Management Dashboard</h1>
+      <span class="text-sm opacity-80">Powered by Supabase</span>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8 space-y-8">
+
+    <!-- Search + Add -->
+    <section class="bg-white shadow rounded-2xl p-6">
+      <h2 class="text-lg font-semibold mb-4">Manage Students</h2>
+      
+      <!-- 🔍 Search -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <input id="searchInput" type="text" placeholder="Search by name..."
+          class="flex-1 border rounded-xl px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+        
+        <!-- ➕ Add -->
+        <form id="addForm" class="flex gap-2">
+          <input type="text" id="addName" placeholder="Name" required
+            class="border rounded-xl px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <input type="number" id="addGrade" placeholder="Grade" required
+            class="w-24 border rounded-xl px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <button type="submit"
+            class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">Add</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 📊 Table -->
+    <section class="bg-white shadow rounded-2xl p-6">
+      <h2 class="text-lg font-semibold mb-4">Student Records</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm border border-gray-200 rounded-lg overflow-hidden" id="studentTable">
+          <thead class="bg-gray-100 text-gray-700">
+            <tr>
+              <th class="p-3 text-left cursor-pointer" onclick="sortTable('id')">ID ⬍</th>
+              <th class="p-3 text-left cursor-pointer" onclick="sortTable('name')">Name ⬍</th>
+              <th class="p-3 text-left cursor-pointer" onclick="sortTable('grade')">Grade ⬍</th>
+              <th class="p-3 text-left cursor-pointer" onclick="sortTable('created_at')">Created At ⬍</th>
+              <th class="p-3 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody" class="divide-y divide-gray-100"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ✏️ Edit -->
+    <section id="editFormContainer" class="hidden bg-white shadow rounded-2xl p-6">
+      <h2 class="text-lg font-semibold mb-4">Edit Student</h2>
+      <form id="editForm" class="flex flex-col md:flex-row gap-3">
+        <input type="text" id="editName" placeholder="Name" required
+          class="flex-1 border rounded-xl px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+        <input type="number" id="editGrade" placeholder="Grade" required
+          class="w-32 border rounded-xl px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+        <button type="submit"
+          class="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition">Update</button>
+        <button type="button" onclick="cancelEdit()"
+          class="bg-gray-400 text-white px-4 py-2 rounded-xl hover:bg-gray-500 transition">Cancel</button>
+      </form>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    // 🔑 Replace with your project keys
+    const supabaseUrl = 'https://lbvhhioxniycjyrpcrnc.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidmhoaW94bml5Y2p5cnBjcm5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1ODk0NzUsImV4cCI6MjA3NTE2NTQ3NX0.rOOdSAESpdD93Lc-SrjaVg3U3Xse295gL9kq8Y0iaR4'
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const studentTableBody = document.getElementById('studentTableBody')
+    const addForm = document.getElementById('addForm')
+    const addName = document.getElementById('addName')
+    const addGrade = document.getElementById('addGrade')
+    const searchInput = document.getElementById('searchInput')
+
+    const editFormContainer = document.getElementById('editFormContainer')
+    const editForm = document.getElementById('editForm')
+    const editName = document.getElementById('editName')
+    const editGrade = document.getElementById('editGrade')
+
+    let currentEditId = null
+    let allStudents = []
+    let currentSortKey = 'id'
+    let sortAsc = true
+
+    async function fetchStudents() {
+      const { data, error } = await supabase.from('students').select('*')
+      if (error) return console.error(error)
+      allStudents = data
+      renderTable()
+    }
+
+    function renderTable() {
+      let filtered = allStudents.filter(s =>
+        s.name.toLowerCase().includes(searchInput.value.toLowerCase())
+      )
+
+      filtered.sort((a, b) => {
+        if (a[currentSortKey] < b[currentSortKey]) return sortAsc ? -1 : 1
+        if (a[currentSortKey] > b[currentSortKey]) return sortAsc ? 1 : -1
+        return 0
+      })
+
+      studentTableBody.innerHTML = ''
+      filtered.forEach(s => {
+        const row = document.createElement('tr')
+        row.className = "hover:bg-gray-50"
+        row.innerHTML = `
+          <td class="p-3">${s.id}</td>
+          <td class="p-3">${s.name}</td>
+          <td class="p-3">${s.grade}</td>
+          <td class="p-3">${new Date(s.created_at).toLocaleString()}</td>
+          <td class="p-3 text-center space-x-2">
+            <button onclick="editStudent(${s.id}, '${s.name}', ${s.grade})"
+              class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">Edit</button>
+            <button onclick="deleteStudent(${s.id})"
+              class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Delete</button>
+          </td>
+        `
+        studentTableBody.appendChild(row)
+      })
+    }
+
+    addForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      await supabase.from('students').insert([
+        { name: addName.value, grade: parseInt(addGrade.value) }
+      ])
+      addForm.reset()
+      fetchStudents()
+    })
+
+    window.editStudent = (id, name, grade) => {
+      currentEditId = id
+      editName.value = name
+      editGrade.value = grade
+      editFormContainer.classList.remove('hidden')
+    }
+
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      await supabase.from('students')
+        .update({ name: editName.value, grade: parseInt(editGrade.value) })
+        .eq('id', currentEditId)
+      editFormContainer.classList.add('hidden')
+      currentEditId = null
+      fetchStudents()
+    })
+
+    window.cancelEdit = () => {
+      editFormContainer.classList.add('hidden')
+      currentEditId = null
+    }
+
+    window.deleteStudent = async (id) => {
+      if (!confirm(`Delete student ID ${id}?`)) return
+      await supabase.from('students').delete().eq('id', id)
+      fetchStudents()
+    }
+
+    window.sortTable = (key) => {
+      if (currentSortKey === key) sortAsc = !sortAsc
+      else { currentSortKey = key; sortAsc = true }
+      renderTable()
+    }
+
+    searchInput.addEventListener('input', renderTable)
+
+    fetchStudents()
+  </script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EduTrack Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #0d47a1;     /* deep institutional blue */
+      --primary-light: #2196f3;    /* lighter blue accent */
+      --accent-orange: #fb8c00;    /* orange highlight */
+      --bg-light: #f4f6f9;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[var(--bg-light)] min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-[var(--primary-blue)] text-white shadow-lg">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-3xl font-semibold tracking-wide">EduTrack</h1>
+      <span class="text-sm opacity-80">Student Management System</span>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10 space-y-10">
+
+    <!-- Search + Add -->
+    <section class="bg-white shadow-xl rounded-2xl p-8">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-6">
+        <input id="searchInput" type="text" placeholder="🔍 Search by name..."
+          class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] text-base">
+        <form id="addForm" class="flex gap-3">
+          <input type="text" id="addName" placeholder="Full Name" required
+            class="border border-gray-300 rounded-xl px-4 py-3 shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] text-base">
+          <input type="number" id="addGrade" placeholder="Grade" required
+            class="w-28 border border-gray-300 rounded-xl px-4 py-3 shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] text-base">
+          <button type="submit"
+            class="bg-[var(--primary-light)] hover:bg-[var(--primary-blue)] text-white px-5 py-3 rounded-xl font-medium text-base transition">Add</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Table -->
+    <section class="bg-white shadow-xl rounded-2xl p-8">
+      <h2 class="text-2xl font-semibold mb-6 text-[var(--primary-blue)]">📋 Student Records</h2>
+      <div class="overflow-x-auto rounded-lg">
+        <table class="min-w-full text-sm border border-gray-200 rounded-lg overflow-hidden" id="studentTable">
+          <thead class="bg-gray-100 text-gray-700 font-medium uppercase tracking-wide">
+            <tr>
+              <th class="p-4 text-left cursor-pointer" onclick="sortTable('id')">ID ⬍</th>
+              <th class="p-4 text-left cursor-pointer" onclick="sortTable('name')">Name ⬍</th>
+              <th class="p-4 text-left cursor-pointer" onclick="sortTable('grade')">Grade ⬍</th>
+              <th class="p-4 text-left cursor-pointer" onclick="sortTable('created_at')">Created At ⬍</th>
+              <th class="p-4 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody" class="divide-y divide-gray-100 bg-white text-gray-800 font-normal"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Edit -->
+    <section id="editFormContainer" class="hidden bg-white shadow-xl rounded-2xl p-8">
+      <h2 class="text-2xl font-semibold mb-6 text-[var(--primary-blue)]">✏️ Edit Student</h2>
+      <form id="editForm" class="flex flex-col md:flex-row gap-4">
+        <input type="text" id="editName" placeholder="Name" required
+          class="flex-1 border border-gray-300 rounded-xl px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 text-base">
+        <input type="number" id="editGrade" placeholder="Grade" required
+          class="w-32 border border-gray-300 rounded-xl px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 text-base">
+        <button type="submit"
+          class="bg-green-600 text-white px-5 py-3 rounded-xl hover:bg-green-700 font-medium text-base transition">Update</button>
+        <button type="button" onclick="cancelEdit()"
+          class="bg-gray-400 text-white px-5 py-3 rounded-xl hover:bg-gray-500 font-medium text-base transition">Cancel</button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Keep your Supabase script here -->
+  <script type="module">
+    // ... your CRUD logic here (same as before, no changes needed) ...
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EduTrack Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #0d47a1;     /* deep institutional blue */
+      --primary-light: #2196f3;    /* lighter blue accent */
+      --accent-orange: #fb8c00;    /* orange highlight */
+      --bg-light: #f4f6f9;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[var(--bg-light)] min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-[var(--primary-blue)] text-white shadow-lg">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-3xl font-semibold tracking-wide">EduTrack</h1>
+      <span class="text-sm opacity-80">Student Management System</span>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10 space-y-10">
+
+    <!-- Search + Add -->
+    <section class="bg-white shadow-xl rounded-2xl p-8">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-6">
+        <input id="searchInput" type="text" placeholder="🔍 Search by name..."
+          class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] text-base">
+        <form id="addForm" class="flex gap-3">
+          <input type="text" id="addName" placeholder="Full Name" required
+            class="border border-gray-300 rounded-xl px-4 py-3 shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] text-base">
+          <input type="number" id="addGrade" placeholder="Grade" required
+            class="w-28 border border-gray-300 rounded-xl px-4 py-3 shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] text-base">
+          <button type="submit"
+            class="bg-[var(--primary-light)] hover:bg-[var(--primary-blue)] text-white px-5 py-3 rounded-xl font-medium text-base transition">Add</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Table -->
+    <section class="bg-white shadow-xl rounded-2xl p-8">
+      <h2 class="text-2xl font-semibold mb-6 text-[var(--primary-blue)]">📋 Student Records</h2>
+      <div class="overflow-x-auto rounded-lg">
+        <table class="min-w-full text-sm border border-gray-200 rounded-lg overflow-hidden" id="studentTable">
+          <thead class="bg-gray-100 text-gray-700 font-medium uppercase tracking-wide">
+            <tr>
+              <th class="p-4 text-left cursor-pointer" onclick="sortTable('id')">ID ⬍</th>
+              <th class="p-4 text-left cursor-pointer" onclick="sortTable('name')">Name ⬍</th>
+              <th class="p-4 text-left cursor-pointer" onclick="sortTable('grade')">Grade ⬍</th>
+              <th class="p-4 text-left cursor-pointer" onclick="sortTable('created_at')">Created At ⬍</th>
+              <th class="p-4 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody" class="divide-y divide-gray-100 bg-white text-gray-800 font-normal"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Edit -->
+    <section id="editFormContainer" class="hidden bg-white shadow-xl rounded-2xl p-8">
+      <h2 class="text-2xl font-semibold mb-6 text-[var(--primary-blue)]">✏️ Edit Student</h2>
+      <form id="editForm" class="flex flex-col md:flex-row gap-4">
+        <input type="text" id="editName" placeholder="Name" required
+          class="flex-1 border border-gray-300 rounded-xl px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 text-base">
+        <input type="number" id="editGrade" placeholder="Grade" required
+          class="w-32 border border-gray-300 rounded-xl px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 text-base">
+        <button type="submit"
+          class="bg-green-600 text-white px-5 py-3 rounded-xl hover:bg-green-700 font-medium text-base transition">Update</button>
+        <button type="button" onclick="cancelEdit()"
+          class="bg-gray-400 text-white px-5 py-3 rounded-xl hover:bg-gray-500 font-medium text-base transition">Cancel</button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Supabase CRUD logic -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    // 🔹 Replace with your own Supabase URL + anon key
+    const supabaseUrl = 'https://lbvhhioxniycjyrpcrnc.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidmhoaW94bml5Y2p5cnBjcm5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1ODk0NzUsImV4cCI6MjA3NTE2NTQ3NX0.rOOdSAESpdD93Lc-SrjaVg3U3Xse295gL9kq8Y0iaR4'
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const studentTableBody = document.getElementById('studentTableBody')
+    const addForm = document.getElementById('addForm')
+    const addName = document.getElementById('addName')
+    const addGrade = document.getElementById('addGrade')
+    const searchInput = document.getElementById('searchInput')
+
+    const editFormContainer = document.getElementById('editFormContainer')
+    const editForm = document.getElementById('editForm')
+    const editName = document.getElementById('editName')
+    const editGrade = document.getElementById('editGrade')
+
+    let currentEditId = null
+    let allStudents = []
+    let currentSortKey = 'id'
+    let sortAsc = true
+
+    // Fetch data
+    async function fetchStudents() {
+      const { data, error } = await supabase.from('students').select('*')
+      if (error) {
+        console.error(error)
+        return
+      }
+      allStudents = data
+      renderTable()
+    }
+
+    // Render table
+    function renderTable() {
+      let filtered = allStudents.filter(s =>
+        s.name.toLowerCase().includes(searchInput.value.toLowerCase())
+      )
+
+      filtered.sort((a, b) => {
+        if (a[currentSortKey] < b[currentSortKey]) return sortAsc ? -1 : 1
+        if (a[currentSortKey] > b[currentSortKey]) return sortAsc ? 1 : -1
+        return 0
+      })
+
+      studentTableBody.innerHTML = ''
+      filtered.forEach(s => {
+        const row = document.createElement('tr')
+        row.className = "hover:bg-gray-50"
+        row.innerHTML = `
+          <td class="p-4">${s.id}</td>
+          <td class="p-4">${s.name}</td>
+          <td class="p-4">${s.grade}</td>
+          <td class="p-4">${new Date(s.created_at).toLocaleString()}</td>
+          <td class="p-4 text-center space-x-2">
+            <button onclick="editStudent(${s.id}, '${s.name}', ${s.grade})"
+              class="bg-[var(--primary-light)] text-white px-3 py-1 rounded-lg hover:bg-[var(--primary-blue)]">Edit</button>
+            <button onclick="deleteStudent(${s.id})"
+              class="bg-[var(--accent-orange)] text-white px-3 py-1 rounded-lg hover:bg-orange-700">Delete</button>
+          </td>
+        `
+        studentTableBody.appendChild(row)
+      })
+    }
+
+    // Add
+    addForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      await supabase.from('students').insert([
+        { name: addName.value, grade: parseInt(addGrade.value) }
+      ])
+      addForm.reset()
+      fetchStudents()
+    })
+
+    // Edit
+    window.editStudent = (id, name, grade) => {
+      currentEditId = id
+      editName.value = name
+      editGrade.value = grade
+      editFormContainer.classList.remove('hidden')
+    }
+
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      await supabase.from('students')
+        .update({ name: editName.value, grade: parseInt(editGrade.value) })
+        .eq('id', currentEditId)
+
+      editFormContainer.classList.add('hidden')
+      currentEditId = null
+      fetchStudents()
+    })
+
+    window.cancelEdit = () => {
+      editFormContainer.classList.add('hidden')
+      currentEditId = null
+    }
+
+    // Delete
+    window.deleteStudent = async (id) => {
+      if (!confirm(`Delete student ID ${id}?`)) return
+      await supabase.from('students').delete().eq('id', id)
+      fetchStudents()
+    }
+
+    // Sort
+    window.sortTable = (key) => {
+      if (currentSortKey === key) sortAsc = !sortAsc
+      else {
+        currentSortKey = key
+        sortAsc = true
+      }
+      renderTable()
+    }
+
+    // Search
+    searchInput.addEventListener('input', renderTable)
+
+    // Load initial data
+    fetchStudents()
+  </script>
+</body>
+</html>

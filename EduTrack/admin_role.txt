@@ -1,0 +1,4 @@
+9acac019-bd0c-4b10-89fb-64f424cc83e2
+
+insert into admins (id, name)
+values ('9acac019-bd0c-4b10-89fb-64f424cc83e2', 'Rajendra Prasad Palnaty');
